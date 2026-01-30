@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  AGENT
+  ADMIN
+}
+
+enum PropertyType {
+  HOUSE
+  APARTMENT
+  VILLA
+  LAND
+  COMMERCIAL
+}
+
+enum PropertyStatus {
+  AVAILABLE
+  PENDING
+  SOLD
+  RENTED
+}
+
+enum ListingType {
+  BUY
+  RENT
+}
+
+model User {
+  id            String      @id @default(cuid())
+  email         String      @unique
+  username      String      @unique
+  password      String
+  name          String
+  phone         String?
+  avatar        String?
+  role          Role        @default(USER)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  properties    Property[]  @relation("AgentProperties")
+  favorites     Favorite[]
+  visits        Visit[]
+  inquiries     Inquiry[]
+  views         PropertyView[]
+}
+
+model Property {
+  id            String          @id @default(cuid())
+  title         String
+  description   String
+  price         Float
+  listingType   ListingType
+  propertyType  PropertyType
+  status        PropertyStatus  @default(AVAILABLE)
+  
+  address       String
+  city          String
+  neighborhood  String?
+  zipCode       String?
+  latitude      Float?
+  longitude     Float?
+  
+  bedrooms      Int
+  bathrooms     Int
+  surfaceArea   Float
+  yearBuilt     Int?
+  
+  hasPool       Boolean         @default(false)
+  hasParking    Boolean         @default(false)
+  hasGarden     Boolean         @default(false)
+  hasAC         Boolean         @default(false)
+  hasGym        Boolean         @default(false)
+  hasElevator   Boolean         @default(false)
+  hasSecurity   Boolean         @default(false)
+  
+  images        String[]
+  videoUrl      String?
+  virtualTour   String?
+  
+  featured      Boolean         @default(false)
+  approved      Boolean         @default(false)
+  viewCount     Int             @default(0)
+  
+  agentId       String
+  agent         User            @relation("AgentProperties", fields: [agentId], references: [id])
+  
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  
+  favorites     Favorite[]
+  visits        Visit[]
+  inquiries     Inquiry[]
+  priceHistory  PriceHistory[]
+  views         PropertyView[]
+}
+
+model Favorite {
+  id          String    @id @default(cuid())
+  userId      String
+  propertyId  String
+  createdAt   DateTime  @default(now())
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, propertyId])
+}
+
+model Visit {
+  id          String    @id @default(cuid())
+  userId      String
+  propertyId  String
+  date        DateTime
+  time        String
+  message     String?
+  status      String    @default("pending")
+  createdAt   DateTime  @default(now())
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
+
+model Inquiry {
+  id          String    @id @default(cuid())
+  userId      String
+  propertyId  String
+  message     String
+  phone       String?
+  email       String?
+  status      String    @default("new")
+  createdAt   DateTime  @default(now())
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
+
+model PriceHistory {
+  id          String    @id @default(cuid())
+  propertyId  String
+  price       Float
+  date        DateTime  @default(now())
+  
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
+
+model PropertyView {
+  id          String    @id @default(cuid())
+  userId      String?
+  propertyId  String
+  viewedAt    DateTime  @default(now())
+  
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
