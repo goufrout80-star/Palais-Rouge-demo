@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   /* Palais Rouge Immobilier - Luxury Color Palette */
@@ -23,13 +25,6 @@
   /* Muted */
   --muted: #8A8178;
   --muted-light: #B5AEA4;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-display: var(--font-playfair);
-  --font-sans: var(--font-dm-sans);
 }
 
 /* Premium Scrollbar */
