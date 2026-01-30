@@ -1,6 +1,9 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import enTranslations from '@/locales/en.json';
+import frTranslations from '@/locales/fr.json';
+import arTranslations from '@/locales/ar.json';
 
 export type Language = 'fr' | 'en' | 'ar';
 export type Currency = 'MAD' | 'USD' | 'EUR';
@@ -18,6 +21,7 @@ interface I18nContextType {
   formatCurrency: (amount: number) => string;
   convertCurrency: (amount: number, from: Currency, to: Currency) => number;
   formatNumber: (num: number) => string;
+  isRTL: boolean;
 }
 
 // Exchange rates (should be updated regularly in production)
@@ -37,141 +41,9 @@ const smartRound = (amount: number, currency: Currency): number => {
 };
 
 const translations: Record<Language, Translation> = {
-  fr: {
-    common: {
-      buy: 'Acheter',
-      rent: 'Louer',
-      sell: 'Vendre',
-      help: 'Aide',
-      contact: 'Contact',
-      search: 'Recherche',
-      properties: 'Propriétés',
-      home: 'Accueil',
-      all_properties: 'Toutes les propriétés',
-      browse_homes: 'Parcourir les maisons',
-      by_location: 'Par emplacement',
-      new_developments: 'Nouveaux développements',
-      mortgage_calculator: 'Calculateur hypothécaire',
-      browse_rentals: 'Parcourir les locations',
-      verified_listings: 'Annonces vérifiées',
-      rental_guide: 'Guide de location',
-      sell_your_home: 'Vendez votre maison',
-      home_valuation: 'Évaluation immobilière',
-      find_an_agent: 'Trouver un agent',
-      selling_guide: 'Guide de vente',
-      faq: 'FAQ',
-      resources: 'Ressources',
-      dashboard: 'Tableau de bord',
-      sign_in: 'Se connecter',
-      get_started: 'Commencer',
-      logout: 'Déconnexion'
-    },
-    property: {
-      price: 'Prix',
-      bedrooms: 'Chambres',
-      bathrooms: 'Salles de bain',
-      area: 'Surface',
-      sqm: 'm²',
-      year_built: 'Année de construction',
-      property_type: 'Type de propriété',
-      listing_type: 'Type d\'annonce'
-    },
-    currency: {
-      mad: 'DH',
-      usd: '$',
-      eur: '€'
-    }
-  },
-  en: {
-    common: {
-      buy: 'Buy',
-      rent: 'Rent',
-      sell: 'Sell',
-      help: 'Help',
-      contact: 'Contact',
-      search: 'Search',
-      properties: 'Properties',
-      home: 'Home',
-      all_properties: 'All Properties',
-      browse_homes: 'Browse Homes',
-      by_location: 'By Location',
-      new_developments: 'New Developments',
-      mortgage_calculator: 'Mortgage Calculator',
-      browse_rentals: 'Browse Rentals',
-      verified_listings: 'Verified Listings',
-      rental_guide: 'Rental Guide',
-      sell_your_home: 'Sell Your Home',
-      home_valuation: 'Home Valuation',
-      find_an_agent: 'Find an Agent',
-      selling_guide: 'Selling Guide',
-      faq: 'FAQ',
-      resources: 'Resources',
-      dashboard: 'Dashboard',
-      sign_in: 'Sign In',
-      get_started: 'Get Started',
-      logout: 'Logout'
-    },
-    property: {
-      price: 'Price',
-      bedrooms: 'Bedrooms',
-      bathrooms: 'Bathrooms',
-      area: 'Area',
-      sqm: 'm²',
-      year_built: 'Year Built',
-      property_type: 'Property Type',
-      listing_type: 'Listing Type'
-    },
-    currency: {
-      mad: 'MAD',
-      usd: 'USD',
-      eur: 'EUR'
-    }
-  },
-  ar: {
-    common: {
-      buy: 'شراء',
-      rent: 'إيجار',
-      sell: 'بيع',
-      help: 'مساعدة',
-      contact: 'اتصال',
-      search: 'بحث',
-      properties: 'العقارات',
-      home: 'الرئيسية',
-      all_properties: 'جميع العقارات',
-      browse_homes: 'تصفح المنازل',
-      by_location: 'حسب الموقع',
-      new_developments: 'مشاريع جديدة',
-      mortgage_calculator: 'حاسبة الرهن العقاري',
-      browse_rentals: 'تصفح الإيجارات',
-      verified_listings: 'إعلانات مُعتمدة',
-      rental_guide: 'دليل الإيجار',
-      sell_your_home: 'بع منزلك',
-      home_valuation: 'تقييم المنزل',
-      find_an_agent: 'ابحث عن وكيل',
-      selling_guide: 'دليل البيع',
-      faq: 'الأسئلة الشائعة',
-      resources: 'الموارد',
-      dashboard: 'لوحة التحكم',
-      sign_in: 'تسجيل الدخول',
-      get_started: 'ابدأ الآن',
-      logout: 'تسجيل الخروج'
-    },
-    property: {
-      price: 'السعر',
-      bedrooms: 'غرف النوم',
-      bathrooms: 'الحمامات',
-      area: 'المساحة',
-      sqm: 'م²',
-      year_built: 'سنة البناء',
-      property_type: 'نوع العقار',
-      listing_type: 'نوع الإعلان'
-    },
-    currency: {
-      mad: 'درهم',
-      usd: 'دولار',
-      eur: 'يورو'
-    }
-  }
+  en: enTranslations,
+  fr: frTranslations,
+  ar: arTranslations
 };
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -179,6 +51,7 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>('fr'); // French default
   const [currency, setCurrency] = useState<Currency>('MAD'); // MAD default
+  const isRTL = language === 'ar';
 
   // Load saved preferences from localStorage
   useEffect(() => {
@@ -201,6 +74,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem('currency', currency);
   }, [currency]);
+
+  // Update document direction and lang attribute for RTL support
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+      document.documentElement.lang = language;
+    }
+  }, [language, isRTL]);
 
   const t = (key: string): string => {
     const keys = key.split('.');
@@ -259,7 +140,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         t,
         formatCurrency,
         convertCurrency,
-        formatNumber
+        formatNumber,
+        isRTL
       }}
     >
       {children}

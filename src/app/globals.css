@@ -59,6 +59,28 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Arabic Font Support */
+[dir="rtl"] body {
+  font-family: var(--font-cairo), var(--font-sans), system-ui, sans-serif;
+}
+
+[dir="rtl"] .font-display {
+  font-family: var(--font-cairo), Georgia, serif;
+}
+
+/* RTL-specific adjustments */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .text-left {
+  text-align: right !important;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left !important;
+}
+
 /* Selection */
 ::selection {
   background: var(--rouge-light);

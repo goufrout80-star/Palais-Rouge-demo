@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, DM_Sans } from "next/font/google";
+import { Playfair_Display, DM_Sans, Cairo } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { SiteConfigProvider } from "@/context/SiteConfigContext";
@@ -21,6 +21,13 @@ const dmSans = DM_Sans({
   weight: ["400", "500", "600", "700"],
 });
 
+const cairo = Cairo({
+  subsets: ["arabic", "latin"],
+  variable: "--font-cairo",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "Palais Rouge Immobilier | L'Excellence Immobilière",
   description: "Découvrez des propriétés d'exception avec Palais Rouge Immobilier. Maisons de luxe, appartements et villas à vendre et à louer.",
@@ -34,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className={`${playfair.variable} ${dmSans.variable} antialiased`}>
+      <body className={`${playfair.variable} ${dmSans.variable} ${cairo.variable} antialiased`}>
         <AuthProvider>
           <I18nProvider>
             <PropertiesProvider>
